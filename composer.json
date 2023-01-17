@@ -1,0 +1,12 @@
+{
+  "name": "bhuynhsd/328/diner",
+  "authors": [
+    {
+      "name": "Bao Huynh",
+      "email": "huynh.bao@greenriver.student.edu"
+    }
+  ],
+  "require": {
+    "bcosca/fatfree-core": "dev-master"
+  }
+}
