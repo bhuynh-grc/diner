@@ -12,6 +12,14 @@ session_start();
 //Require the autoload file
 require_once('vendor/autoload.php');
 require_once('model/data-layer.php');
+require_once('model/validate.php');
+
+//$food1 = "tacos";
+//$food2 = "";
+//$food3 = "x";
+//echo validFood($food1) ? "valid" : "not valid";
+//echo validFood($food2) ? "valid" : "not valid";
+//echo validFood($food3) ? "valid" : "not valid";
 //getMeal();
 //getCondiments();
 
@@ -52,12 +60,30 @@ $f3->route('GET|POST /order12', function ($f3){
     //If the form has been submitted
     if ($_SERVER['REQUEST_METHOD'] == "POST"){
 
-        //Move data from POST
-        $_SESSION['food'] = $_POST['food'];
-        $_SESSION['meal'] = $_POST['meal'];
+        //Move data from POST array to SESSION array
+        $food = trim($_POST['food']);
+        if(validFood($food)){
+            $_SESSION['food'] = $food;
+        }else{
+            $f3 -> set('errors["food"]', 'Food must have at least 2 chars');
+        }
 
-        //redirect to summary page
-        $f3->reroute('order2');
+        //Validate the meal
+        $meal = $_POST['meal'];
+        if(validMead($meal)){
+            $_SESSION['meal'] = $meal;
+        }else{
+            $f3->set('errors["meal"]', 'Meal is invalid');
+        }
+
+//        $_SESSION['food'] = $_POST['food'];
+//        $_SESSION['meal'] = $_POST['meal'];
+
+        if(empty($f3->get('errors'))){
+            //redirect to summary page
+            $f3->reroute('order2');
+        }
+
     }
 
     //Add meals to F3 hive
