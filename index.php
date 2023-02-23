@@ -5,14 +5,22 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-//start a session
-session_start();
 
 
 //Require the autoload file
 require_once('vendor/autoload.php');
 require_once('model/data-layer.php');
 require_once('model/validate.php');
+//require_once('classes/order.php');
+
+//start a session
+session_start();
+//var_dump($_SESSION);
+
+//$myOrder = new Order();
+//$myOrder->setFood("tacos");
+//echo $myOrder->getFood();
+//var_dump($myOrder);
 
 //$food1 = "tacos";
 //$food2 = "";
@@ -60,10 +68,12 @@ $f3->route('GET|POST /order12', function ($f3){
     //If the form has been submitted
     if ($_SERVER['REQUEST_METHOD'] == "POST"){
 
+        $newOrder = new Order();
+
         //Move data from POST array to SESSION array
         $food = trim($_POST['food']);
         if(validFood($food)){
-            $_SESSION['food'] = $food;
+            $newOrder->setFood($food);
         }else{
             $f3 -> set('errors["food"]', 'Food must have at least 2 chars');
         }
@@ -71,15 +81,18 @@ $f3->route('GET|POST /order12', function ($f3){
         //Validate the meal
         $meal = $_POST['meal'];
         if(validMead($meal)){
-            $_SESSION['meal'] = $meal;
+            $newOrder->setMeal($meal);
         }else{
             $f3->set('errors["meal"]', 'Meal is invalid');
         }
+
+
 
 //        $_SESSION['food'] = $_POST['food'];
 //        $_SESSION['meal'] = $_POST['meal'];
 
         if(empty($f3->get('errors'))){
+            $_SESSION['newOrder'] = $newOrder;
             //redirect to summary page
             $f3->reroute('order2');
         }
@@ -101,9 +114,20 @@ $f3->route('GET|POST /order2', function ($f3){
     //If the form has been submitted
     if ($_SERVER['REQUEST_METHOD'] == "POST"){
 
+        //Move data from POST array to SESSION array
+
+//        $newOrder = $_SESSION['newOrder'];
+//        $condString = implode(", ",$_POST['conds']);
+//        $newOrder->setCondiments($condString);
+//        $_SESSION['newOrder'] = $newOrder;
+
+        //Move data from
+        $condString = implode(", ",$_POST['conds']);
+        $_SESSION['newOrder']->setCondiments($condString);
+
         //Move data from POST
-        $_SESSION['food'] = $_POST['food'];
-        $_SESSION['meal'] = $_POST['meal'];
+//        $_SESSION['food'] = $_POST['food'];
+//        $_SESSION['meal'] = $_POST['meal'];
 
         //redirect to summary page
         $f3->reroute('summary');
@@ -121,9 +145,15 @@ $f3->route('GET|POST /order2', function ($f3){
 //Define a default route (328/diner/order-summary)
 $f3->route('GET /summary', function (){
 
+    //Write to Database
+
+
     //Instantiate a view
     $view = new Template();
     echo $view->render("views/order-summary.html");
+
+    //Destroy session array
+    sessson_destroy();
 });
 
 
